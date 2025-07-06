@@ -22,9 +22,19 @@ export default function App() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setResult(null);
+
+    // Input validation
+    for (const key in form) {
+      if (form[key] === "" || isNaN(Number(form[key]))) {
+        alert(`Please enter a valid number for ${key.replace(/_/g, " ")}`);
+        setLoading(false);
+        return;
+      }
+    }
 
     try {
-      const response = await fetch("https://your-backend-url.onrender.com/predict", {
+      const response = await fetch("http://192.164.1.57:8000/predict", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,10 +43,22 @@ export default function App() {
       });
 
       const data = await response.json();
-      setResult(data);
+
+      if (!response.ok) {
+        setResult({
+          status: "Error",
+          prediction: data.error || "Unknown backend error",
+          probability: "N/A",
+        });
+      } else {
+        setResult(data);
+      }
     } catch (error) {
-      console.error("Error:", error);
-      setResult({ status: "Error", prediction: "N/A", probability: "N/A" });
+      setResult({
+        status: "Error",
+        prediction: error.message,
+        probability: "N/A",
+      });
     }
 
     setLoading(false);
@@ -68,9 +90,15 @@ export default function App() {
         {result && (
           <div className="result">
             <h2>Prediction Result</h2>
-            <p>Status: <strong>{result.status}</strong></p>
-            <p>Prediction: <strong>{result.prediction}</strong></p>
-            <p>Probability: <strong>{result.probability}</strong></p>
+            <p>
+              Status: <strong>{result.status}</strong>
+            </p>
+            <p>
+              Prediction: <strong>{result.prediction}</strong>
+            </p>
+            <p>
+              Probability: <strong>{result.probability}</strong>
+            </p>
           </div>
         )}
       </div>
