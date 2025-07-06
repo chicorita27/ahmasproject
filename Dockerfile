@@ -1,33 +1,31 @@
 # Use Python 3.11 base image
 FROM python:3.11-slim
 
-# Set working directory inside container
+# Set working directory
 WORKDIR /app
 
-# Debug: print Python and pip versions
-RUN python --version
-RUN pip --version
+# Install system dependencies for Node.js and build tools
+RUN apt-get update && apt-get install -y curl build-essential
 
-# Copy backend files
+# Install Node.js 20.x and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+ && apt-get install -y nodejs
+
+# Copy backend files first (for pip install caching)
 COPY ./backend /app/backend
 
-# Install Python dependencies
+# Upgrade pip and install Python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r backend/requirements.txt
 
 # Copy frontend files
 COPY ./ahmas-frontend-vite /app/ahmas-frontend-vite
 
-# Install curl, Node.js (latest LTS), and npm
-RUN apt-get update && apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-RUN apt-get install -y nodejs
-
-# Install frontend dependencies and build frontend
+# Install frontend dependencies and build React frontend
 RUN cd ahmas-frontend-vite && npm install && npm run build
 
 # Expose port your Flask app will run on
 EXPOSE 8000
 
-# Command to run Flask app (adjust path if needed)
-CMD ["python", "backend/app.py"]
+# Run Flask app with gunicorn
+CMD ["gunicorn", "backend.app:app", "--bind", "0.0.0.0:8000"]
