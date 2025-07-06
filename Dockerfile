@@ -4,6 +4,10 @@ FROM python:3.11-slim
 # Set working directory inside container
 WORKDIR /app
 
+# Debug: print Python and pip versions
+RUN python --version
+RUN pip --version
+
 # Copy backend files
 COPY ./backend /app/backend
 
@@ -14,8 +18,12 @@ RUN pip install -r backend/requirements.txt
 # Copy frontend files
 COPY ./ahmas-frontend-vite /app/ahmas-frontend-vite
 
+# Install curl, Node.js (latest LTS), and npm
+RUN apt-get update && apt-get install -y curl
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
+
 # Install frontend dependencies and build frontend
-RUN apt-get update && apt-get install -y nodejs npm
 RUN cd ahmas-frontend-vite && npm install && npm run build
 
 # Expose port your Flask app will run on
