@@ -44,34 +44,36 @@ export default function App() {
 
   return (
     <div className="app">
-      <h1>🚆 AHMAS Fault Predictor</h1>
-      <form onSubmit={handleSubmit}>
-        {Object.keys(form).map((field) => (
-          <div key={field} className="input-group">
-            <label>{field.replace(/_/g, " ")}</label>
-            <input
-              type="number"
-              name={field}
-              value={form[field]}
-              onChange={handleChange}
-              step="any"
-              required
-            />
-          </div>
-        ))}
-        <button type="submit" disabled={loading}>
-          {loading ? "Predicting..." : "Predict"}
-        </button>
-      </form>
+      <div className="container">
+        <h1>🚆 AHMAS Fault Predictor</h1>
+        <form onSubmit={handleSubmit}>
+          {Object.keys(form).map((field) => (
+            <div key={field} className="input-group">
+              <label>{field.replace(/_/g, " ")}</label>
+              <input
+                type="number"
+                name={field}
+                value={form[field]}
+                onChange={handleChange}
+                step="any"
+                required
+              />
+            </div>
+          ))}
+          <button type="submit" disabled={loading}>
+            {loading ? "Predicting..." : "Predict"}
+          </button>
+        </form>
 
-      {result && (
-        <div className="result">
-          <h2>Result</h2>
-          <p>Status: <strong>{result.status}</strong></p>
-          <p>Prediction: <strong>{result.prediction}</strong></p>
-          <p>Probability: <strong>{result.probability}</strong></p>
-        </div>
-      )}
+        {result && (
+          <div className="result">
+            <h2>Prediction Result</h2>
+            <p>Status: <strong>{result.status}</strong></p>
+            <p>Prediction: <strong>{result.prediction}</strong></p>
+            <p>Probability: <strong>{result.probability}</strong></p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
