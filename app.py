@@ -2,8 +2,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
 import numpy as np
+from flask import Flask
 
-app = Flask(__name__)
+app = Flask(__name__)  # ← this line is required
+
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 
